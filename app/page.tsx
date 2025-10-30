@@ -1,65 +1,69 @@
+"use client"; // Bu çok önemli, useState ve useEffect için gerekli
+
 import { useState } from "react";
 
+// Öğrenci tipi
 type Student = {
   id: number;
   name: string;
   status: "Var" | "Yok" | "Raporlu";
 };
 
-export default function Home() {
-  const [students, setStudents] = useState<Student[]>([
-    { id: 1, name: "Mehmet Avcı", status: "Var" },
-    { id: 2, name: "Elif Kaya", status: "Var" },
-    { id: 3, name: "Gamze Erişdi", status: "Var" },
-    { id: 4, name: "Melissa Bostancı", status: "Var" },
-    { id: 5, name: "Bersu Demir", status: "Var" },
-  ]);
+// Örnek öğrenciler (sonradan veritabanından çekebilirsin)
+const initialStudents: Student[] = [
+  { id: 1, name: "Ahmet Yılmaz", status: "Var" },
+  { id: 2, name: "Ayşe Demir", status: "Var" },
+  { id: 3, name: "Mehmet Avcı", status: "Var" },
+];
 
-  const handleStatusChange = (id: number, status: "Var" | "Yok" | "Raporlu") => {
-    setStudents(
-      students.map((s) => (s.id === id ? { ...s, status } : s))
+export default function Page() {
+  const [students, setStudents] = useState<Student[]>(initialStudents);
+
+  // Durum değiştirici fonksiyon
+  const handleStatusChange = (id: number, status: Student["status"]) => {
+    setStudents(prev =>
+      prev.map(student =>
+        student.id === id ? { ...student, status } : student
+      )
     );
   };
 
-  const getColor = (status: string) => {
+  // Renkleri belirleme
+  const getStatusColor = (status: Student["status"]) => {
     switch (status) {
       case "Var":
-        return "bg-green-500 text-white";
+        return "bg-green-500";
       case "Yok":
-        return "bg-red-500 text-white";
+        return "bg-red-500";
       case "Raporlu":
-        return "bg-yellow-400 text-black";
+        return "bg-yellow-400";
       default:
         return "";
     }
   };
 
-  const handleSave = () => {
-    alert("Yoklama kaydedildi! (demo)");
-    console.log(students);
-  };
-
   return (
-    <div className="p-8 font-sans">
-      <h1 className="text-2xl font-bold mb-4">Akıllı Yoklama Sistemi</h1>
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-6">Akıllı Yoklama Sistemi</h1>
       <table className="min-w-full border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border px-4 py-2">Öğrenci Adı</th>
-            <th className="border px-4 py-2">Durum</th>
+            <th className="border p-2 text-left">Öğrenci Adı</th>
+            <th className="border p-2 text-left">Durum</th>
           </tr>
         </thead>
         <tbody>
-          {students.map((student) => (
-            <tr key={student.id} className={getColor(student.status)}>
-              <td className="border px-4 py-2">{student.name}</td>
-              <td className="border px-4 py-2">
+          {students.map(student => (
+            <tr key={student.id}>
+              <td className="border p-2">{student.name}</td>
+              <td className="border p-2">
                 <select
+                  className={`p-1 rounded ${getStatusColor(student.status)} text-white`}
                   value={student.status}
-                  onChange={(e) =>
+                  onChange={e =>
                     handleStatusChange(
                       student.id,
-                      e.target.value as "Var" | "Yok" | "Raporlu"
+                      e.target.value as Student["status"]
                     )
                   }
                 >
@@ -72,12 +76,6 @@ export default function Home() {
           ))}
         </tbody>
       </table>
-      <button
-        onClick={handleSave}
-        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-      >
-        Kaydet
-      </button>
     </div>
   );
 }
